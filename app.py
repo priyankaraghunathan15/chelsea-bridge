@@ -230,6 +230,7 @@ with tabs[1]:
                 </div>
             </div>
         """, unsafe_allow_html=True)
+        st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)  # 24px vertical space
 
         st.button("📤 Publish to Signboard", key="vms_button")
 
@@ -288,6 +289,7 @@ with tabs[1]:
                 <span style='color:#1DA1F2;'>Twitter Web App</span>
             </div>
         """, unsafe_allow_html=True)
+        st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)  # 24px vertical space
 
         st.button("Post Tweet Update", key="tweet_button")
 

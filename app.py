@@ -133,7 +133,7 @@ tabs = st.tabs(["Home", "Notifications", "Historical Trends", "About"])
 
 # ----------------- HOME TAB -----------------
 with tabs[0]:
-    col1, spacer, col2, col3 = st.columns([1, 0.2, 1, 1])
+    col1, spacer, col2, spacer, col3 = st.columns([1, 0.3, 1, 0.3, 1])
 
     with col1:
         st.markdown("<h3 style='color:#003366; text-align:center;'>Next Predicted</h3>", unsafe_allow_html=True)

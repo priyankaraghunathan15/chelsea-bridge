@@ -190,7 +190,7 @@ with tabs[0]:
                 <p>🌊 <strong>Tide Level:</strong> Mid Tide</p>
             </div>
         """, unsafe_allow_html=True)
-
+    st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)  # 24px vertical space
     st.markdown("""
         <div style='background-color:#f1f3f5; padding:12px; text-align:center; font-size:12px; color: #555;'>
             Powered by ChelseaBridgeAI | Historical data (2019–2025)

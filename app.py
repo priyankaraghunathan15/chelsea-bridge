@@ -85,7 +85,7 @@ confidence = round(np.max(proba) * 100, 1)
 estimated_duration = random.randint(15, 20)
 
 next_lift_times = [
-    (now + timedelta(minutes=14 + i * 90)).astimezone(BOSTON_TZ).strftime("%I:%M %p %Z")
+    (now + timedelta(minutes=14 + i * 90)).astimezone(BOSTON_TZ).strftime("%I:%M %p")
     for i in range(3)
 ]
 
@@ -123,7 +123,7 @@ st.markdown(f"""
             <span style="font-size: 34px; font-weight: 700; color: #003366;">Chelsea Bridge Lift Forecast System</span>
         </div>
         <div style="flex: 1; text-align: right; font-size: 16px; color: #333;">
-            Last updated at: <strong>{now.strftime('%-I:%M %p %Z')}</strong>
+            Last updated at: <strong>{now.strftime('%-I:%M %p')}</strong>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -239,7 +239,7 @@ with tabs[1]:
         end_time = now.replace(hour=19, minute=30, second=0, microsecond=0)
 
         homepage_times = [
-            datetime.strptime(t, "%I:%M %p %Z").replace(
+            datetime.strptime(t, "%I:%M %p").replace(
                 year=now.year, month=now.month, day=now.day,
                 tzinfo=BOSTON_TZ
             )

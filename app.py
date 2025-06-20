@@ -90,7 +90,13 @@ confidence = round(np.max(proba) * 100, 1)  # Rounded value
 estimated_duration = random.randint(15, 20)
 
 # Create time slots for the next predicted lifts
-next_lift_times = [(now + timedelta(minutes=14 + i*90)).strftime("%I:%M %p %Z") for i in range(3)]
+from zoneinfo import ZoneInfo
+
+next_lift_times = [
+    (now + timedelta(minutes=14 + i * 90)).astimezone(ZoneInfo("America/New_York")).strftime("%I:%M %p %Z")
+    for i in range(3)
+]
+
 
 # Confidence color gauge
 if confidence < 60:
@@ -262,8 +268,9 @@ with tabs[1]:
         end_time = now.replace(hour=19, minute=30, second=0, microsecond=0)
 
         homepage_times = [
-            datetime.strptime(t, "%I:%M %p %Z").replace(
-                year=now.year, month=now.month, day=now.day
+            datetime.strptime(t, "%I:%M %p").replace(
+                year=now.year, month=now.month, day=now.day,
+                tzinfo=ZoneInfo("America/New_York")
             )
             for t in next_lift_times
         ]
@@ -308,7 +315,7 @@ with tabs[1]:
                 <strong style='font-size:18px;'>@LoganToChelsea</strong> &nbsp;
                 <span style='color:#555;'>· {now.strftime('%b %d')}</span>
                 <p style='margin-top:10px; margin-bottom:10px;'>
-                    {now.strftime('%-m/%-d')} Expected Bridge Lifts<br>
+                    {now.strftime('%m').lstrip("0")}/{now.strftime('%d').lstrip("0")} Expected Bridge Lifts<br>
                     {"<br>".join(lift_schedule_strs)}<br><br>
                     <em>*Subject to change</em>
                 </p>

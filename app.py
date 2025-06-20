@@ -84,10 +84,26 @@ proba = model.predict_proba(X_scaled)[0]
 confidence = round(np.max(proba) * 100, 1)
 estimated_duration = random.randint(15, 20)
 
-next_lift_times = [
-    (now + timedelta(minutes=14 + i * 90)).astimezone(BOSTON_TZ).strftime("%I:%M %p")
+from datetime import datetime, timedelta
+
+# Define your time window
+start_time = now.replace(hour=7, minute=0, second=0, microsecond=0)
+end_time = now.replace(hour=19, minute=30, second=0, microsecond=0)
+
+# Generate candidate lift times as datetime objects
+candidate_times = [
+    (now + timedelta(minutes=14 + i * 90)).astimezone(BOSTON_TZ)
     for i in range(3)
 ]
+
+# Filter to only include times within the window
+filtered_times = [
+    t for t in candidate_times if start_time <= t <= end_time
+]
+
+# Format as strings for display
+next_lift_times = [t.strftime("%I:%M %p") for t in filtered_times]
+
 
 # Confidence gauge setup
 bar_color = "#4CAF50" if confidence >= 80 else "#FFB84D" if confidence >= 60 else "#FF4C4C"

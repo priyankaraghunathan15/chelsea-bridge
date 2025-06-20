@@ -9,7 +9,9 @@ from sklearn.preprocessing import StandardScaler
 from lightgbm import LGBMClassifier
 import random
 import plotly.express as px 
-
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+now = datetime.now(ZoneInfo("America/New_York")) 
 # Page config
 st.set_page_config(
     page_title="Chelsea Bridge Lift Forecast System",
@@ -88,7 +90,7 @@ confidence = round(np.max(proba) * 100, 1)  # Rounded value
 estimated_duration = random.randint(15, 20)
 
 # Create time slots for the next predicted lifts
-next_lift_times = [(now + timedelta(minutes=14 + i*90)).strftime("%I:%M %p") for i in range(3)]
+next_lift_times = [(now + timedelta(minutes=14 + i*90)).strftime("%I:%M %p %Z") for i in range(3)]
 
 # Confidence color gauge
 if confidence < 60:
@@ -140,7 +142,7 @@ st.markdown(f"""
             <span style="font-size: 34px; font-weight: 700; color: #003366; line-height: 1;">Chelsea Bridge Lift Forecast System</span>
         </div>
         <div style="flex: 1; display: flex; justify-content: flex-end; align-items: center; font-size: 16px; color: #333;">
-            Last updated at: <strong>{now.strftime('%-I:%M %p')}</strong>
+            Last updated at: <strong>{now.strftime('%-I:%M %p %Z')}</strong>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -260,7 +262,7 @@ with tabs[1]:
         end_time = now.replace(hour=19, minute=30, second=0, microsecond=0)
 
         homepage_times = [
-            datetime.strptime(t, "%I:%M %p").replace(
+            datetime.strptime(t, "%I:%M %p %Z").replace(
                 year=now.year, month=now.month, day=now.day
             )
             for t in next_lift_times

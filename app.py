@@ -2,23 +2,21 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import plotly.express as px
 import joblib
 from datetime import datetime, timedelta
-from PIL import Image
-from sklearn.preprocessing import StandardScaler
-from lightgbm import LGBMClassifier
-import random
-import plotly.express as px 
-from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-now = datetime.now(ZoneInfo("America/New_York")) 
-# Page config
-st.set_page_config(
-    page_title="Chelsea Bridge Lift Forecast System",
-    layout="wide"
-)
+import random
+from sklearn.preprocessing import StandardScaler
 
-# Custom CSS for tabs and hover effects
+# Set Boston timezone
+BOSTON_TZ = ZoneInfo("America/New_York")
+now = datetime.now(BOSTON_TZ)
+
+# Page configuration
+st.set_page_config(page_title="Chelsea Bridge Lift Forecast System", layout="wide")
+
+# Custom styling
 st.markdown("""
     <style>
         .stTabs [data-baseweb="tab-list"] {
@@ -37,15 +35,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Load models and scaler
+# Load model and scaler
 model = joblib.load("lightgbm_lift_model.pkl")
 scaler = joblib.load("scaler.pkl")
 
-# Simulate features for current time
-now = datetime.now()
+# Simulated features (replace with live inputs if needed)
 hour = now.hour
 day_of_week = now.weekday()
-is_weekend = int(day_of_week in [5, 6])
+is_weekend = int(day_of_week >= 5)
 is_peak_hour = int(hour in range(7, 10) or hour in range(16, 19))
 time_since_last_lift = 45
 
@@ -84,38 +81,22 @@ X_input = pd.DataFrame([features])
 X_scaled = scaler.transform(X_input)
 y_pred = model.predict(X_scaled)[0]
 proba = model.predict_proba(X_scaled)[0]
-confidence = round(np.max(proba) * 100, 1)  # Rounded value
-
-# Simulated estimated duration between 15–20 mins
+confidence = round(np.max(proba) * 100, 1)
 estimated_duration = random.randint(15, 20)
 
-# Create time slots for the next predicted lifts
-from zoneinfo import ZoneInfo
-
 next_lift_times = [
-    (now + timedelta(minutes=14 + i * 90)).astimezone(ZoneInfo("America/New_York")).strftime("%I:%M %p %Z")
+    (now + timedelta(minutes=14 + i * 90)).astimezone(BOSTON_TZ).strftime("%I:%M %p %Z")
     for i in range(3)
 ]
 
-
-# Confidence color gauge
-if confidence < 60:
-    bar_color = "#FF4C4C"
-    bg_color = "#FFEAEA"
-elif confidence < 80:
-    bar_color = "#FFB84D"
-    bg_color = "#FFF5E5"
-else:
-    bar_color = "#4CAF50"
-    bg_color = "#E8F5E9"
+# Confidence gauge setup
+bar_color = "#4CAF50" if confidence >= 80 else "#FFB84D" if confidence >= 60 else "#FF4C4C"
+bg_color = "#E8F5E9" if confidence >= 80 else "#FFF5E5" if confidence >= 60 else "#FFEAEA"
 
 fig = go.Figure(go.Indicator(
     mode="gauge+number",
     value=confidence,
-    number={
-        'suffix': "%",
-        'font': {'size': 30, 'color': "#333"}  # reduced from 36 to 30
-    },
+    number={'suffix': "%", 'font': {'size': 30, 'color': "#333"}},
     gauge={
         'shape': "angular",
         'axis': {'range': [0, 100], 'visible': False},
@@ -130,24 +111,18 @@ fig = go.Figure(go.Indicator(
         }
     }
 ))
-
-fig.update_layout(
-    width=100,
-    height=100,
-    margin=dict(l=0, r=0, t=10, b=0),
-    paper_bgcolor="rgba(0,0,0,0)"
-)
+fig.update_layout(width=100, height=100, margin=dict(l=0, r=0, t=10, b=0), paper_bgcolor="rgba(0,0,0,0)")
 
 # Header
 st.markdown(f"""
     <div style="display: flex; align-items: center; justify-content: space-between; background-color: #fafbfc; padding: 20px 0; border-radius: 8px; margin-bottom: 20px;">
-        <div style="flex: 1; display: flex; justify-content: flex-start; align-items: center;">
-            <img src='https://img.masstransitmag.com/files/base/cygnus/mass/image/2014/09/massdot-logo_11678559.png' style='height: 80px; width: auto;' />
+        <div style="flex: 1; display: flex; justify-content: flex-start;">
+            <img src='https://img.masstransitmag.com/files/base/cygnus/mass/image/2014/09/massdot-logo_11678559.png' style='height: 80px;' />
         </div>
-        <div style="flex: 2; display: flex; justify-content: center; align-items: center;">
-            <span style="font-size: 34px; font-weight: 700; color: #003366; line-height: 1;">Chelsea Bridge Lift Forecast System</span>
+        <div style="flex: 2; text-align: center;">
+            <span style="font-size: 34px; font-weight: 700; color: #003366;">Chelsea Bridge Lift Forecast System</span>
         </div>
-        <div style="flex: 1; display: flex; justify-content: flex-end; align-items: center; font-size: 16px; color: #333;">
+        <div style="flex: 1; text-align: right; font-size: 16px; color: #333;">
             Last updated at: <strong>{now.strftime('%-I:%M %p %Z')}</strong>
         </div>
     </div>
@@ -156,9 +131,9 @@ st.markdown(f"""
 # Tabs
 tabs = st.tabs(["Home", "Notifications", "Historical Trends", "About"])
 
-# -------- Home Tab --------
+# ----------------- HOME TAB -----------------
 with tabs[0]:
-    col1, spacer1, col2, spacer2, col3 = st.columns([1, 0.3, 1, 0.3, 1])
+    col1, spacer, col2, col3 = st.columns([1, 0.2, 1, 1])
 
     with col1:
         st.markdown("<h3 style='color:#003366; text-align:center;'>Next Predicted</h3>", unsafe_allow_html=True)
@@ -177,14 +152,13 @@ with tabs[0]:
         st.plotly_chart(fig)
 
         st.markdown("<div style='height:36px;'></div>", unsafe_allow_html=True)
-        st.markdown("<h3 style='color:#003366; text-align:center; margin-bottom: 4px;'>Bridge Status</h3>", unsafe_allow_html=True)
-
         bridge_status = "OPEN" if time_since_last_lift < 20 else "CLOSED"
         status_color = "red" if bridge_status == "OPEN" else "green"
         status_bg = "#fff2f2" if bridge_status == "OPEN" else "#e7f8ec"
 
         st.markdown(f"""
-            <div style='background-color: {status_bg}; color: {status_color}; font-size: 26px; font-weight: bold; padding: 14px; border-radius: 12px; text-align: center; box-shadow: 2px 2px 6px rgba(0,0,0,0.1); margin-top: 0;'>
+            <h3 style='color:#003366; text-align:center;'>Bridge Status</h3>
+            <div style='background-color: {status_bg}; color: {status_color}; font-size: 26px; font-weight: bold; padding: 14px; border-radius: 12px; text-align: center; box-shadow: 2px 2px 6px rgba(0,0,0,0.1);'>
                 {bridge_status}
             </div>
         """, unsafe_allow_html=True)
@@ -195,11 +169,7 @@ with tabs[0]:
             <div style='background-color: white; font-size: 24px; font-weight: bold; color: #003366; padding: 14px; text-align: center; border-radius: 12px; box-shadow: 2px 2px 6px rgba(0,0,0,0.1);'>
                 {estimated_duration} mins
             </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown(f"""
-            <div style='background-color: #d9eaff; padding: 12px; border-radius: 12px; 
-                        margin-top: 120px; font-size: 16px; text-align: center;'>
+            <div style='background-color: #d9eaff; padding: 12px; border-radius: 12px; margin-top: 120px; font-size: 16px; text-align: center;'>
                 <p style='font-size:18px; margin-bottom: 8px;'>🌤️ <strong>Weather:</strong> Clear, 66°F</p>
                 <p>🌊 <strong>Tide Level:</strong> Mid Tide</p>
             </div>
@@ -215,6 +185,7 @@ with tabs[0]:
 with tabs[1]:
     col_vms, col_tweet = st.columns(2)
 
+    # --- VMS Panel ---
     with col_vms:
         st.markdown(f"""
             <div style='
@@ -259,18 +230,18 @@ with tabs[1]:
             </div>
         """, unsafe_allow_html=True)
 
-
-
         st.button("📤 Publish to Signboard", key="vms_button")
 
+    # --- Twitter Panel ---
     with col_tweet:
+        # Boston-localized time window
         start_time = now.replace(hour=7, minute=0, second=0, microsecond=0)
         end_time = now.replace(hour=19, minute=30, second=0, microsecond=0)
 
         homepage_times = [
-            datetime.strptime(t, "%I:%M %p").replace(
+            datetime.strptime(t, "%I:%M %p %Z").replace(
                 year=now.year, month=now.month, day=now.day,
-                tzinfo=ZoneInfo("America/New_York")
+                tzinfo=BOSTON_TZ
             )
             for t in next_lift_times
         ]
@@ -282,20 +253,14 @@ with tabs[1]:
             candidate = start_time + timedelta(minutes=random.randint(0, 770))
             if start_time <= candidate <= end_time:
                 if all(abs((candidate - existing[0]).total_seconds()) >= 90 * 60 for existing in day_lifts):
-                    duration = random.choice([15, 20, 25])
-                    day_lifts.append((candidate, duration))
+                    day_lifts.append((candidate, random.choice([15, 20, 25])))
             attempts += 1
 
-        # Ensure the homepage first lift has same duration
-        day_lifts = [
-            (lt, estimated_duration if lt == homepage_times[0] else dur)
-            for lt, dur in day_lifts
-        ]
-
-        # Sort again to restore ascending order after modification
+        # Ensure first homepage time has actual homepage-estimated duration
+        day_lifts = [(lt, estimated_duration if lt == homepage_times[0] else dur) for lt, dur in day_lifts]
         day_lifts = sorted(day_lifts, key=lambda x: x[0])
 
-
+        # Format the lifts as readable strings
         lift_schedule_strs = [
             f"{lt.strftime('%I:%M %p')} — estimated duration {dur} mins"
             for lt, dur in day_lifts
@@ -315,7 +280,7 @@ with tabs[1]:
                 <strong style='font-size:18px;'>@LoganToChelsea</strong> &nbsp;
                 <span style='color:#555;'>· {now.strftime('%b %d')}</span>
                 <p style='margin-top:10px; margin-bottom:10px;'>
-                    {now.strftime('%m').lstrip("0")}/{now.strftime('%d').lstrip("0")} Expected Bridge Lifts<br>
+                    {now.month}/{now.day} Expected Bridge Lifts<br>
                     {"<br>".join(lift_schedule_strs)}<br><br>
                     <em>*Subject to change</em>
                 </p>
@@ -325,6 +290,7 @@ with tabs[1]:
 
         st.button("Post Tweet Update", key="tweet_button")
 
+    # Footer
     st.markdown("""
         <div style='background-color:#f1f3f5; padding:12px; text-align:center; font-size:12px; color: #555;'>
             Powered by ChelseaBridgeAI | Historical data (2019–2025)

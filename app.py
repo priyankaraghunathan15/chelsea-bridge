@@ -184,6 +184,7 @@ with tabs[0]:
 
 with tabs[1]:
     col_vms, col_tweet = st.columns(2)
+    col_vms, spacer, col_tweet = st.columns([ 2, 0.2, 2])
 
     # --- VMS Panel ---
     with col_vms:

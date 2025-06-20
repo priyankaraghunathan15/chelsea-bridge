@@ -186,7 +186,7 @@ with tabs[0]:
                 {estimated_duration} mins
             </div>
             <div style='background-color: #d9eaff; padding: 12px; border-radius: 12px; margin-top: 120px; font-size: 16px; text-align: center;'>
-                <p style='font-size:18px; margin-bottom: 8px;'>🌤️ <strong>Weather:</strong> Clear, 66°F</p>
+                <p style='font-size:18px; margin-bottom: 8px;'>🌤️ <strong>Weather:</strong> Clear, 79°F</p>
                 <p>🌊 <strong>Tide Level:</strong> Mid Tide</p>
             </div>
         """, unsafe_allow_html=True)

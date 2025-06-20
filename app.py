@@ -318,7 +318,7 @@ with tabs[1]:
 
 
 with tabs[2]:
-    st.markdown("<h3 style='text-align: center;'>Historical Lift Trends (Weekly Averages)</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>Historical Lift Trends (Previous Week)</h3>", unsafe_allow_html=True)
 
     # Load and process data
     df = pd.read_csv("Final_cleaned_data.csv")

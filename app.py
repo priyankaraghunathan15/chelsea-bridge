@@ -318,7 +318,7 @@ with tabs[1]:
 
 
 with tabs[2]:
-    st.markdown("<h3 style='text-align: center;'>Historical Lift Trends (Previous Week)</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>Historical Lift Trends - Previous Week</h3>", unsafe_allow_html=True)
 
     # Load and process data
     df = pd.read_csv("Final_cleaned_data.csv")
@@ -402,9 +402,11 @@ with tabs[2]:
             'xanchor': 'center',
             'font': {'size': 22}
         },
-        showlegend=True
+        showlegend=True,
+        legend_title=dict(
+            text='Tide Level'
+        )
     )
-
     st.plotly_chart(donut, use_container_width=True)
 
     ## 4. Histogram: Lift duration
